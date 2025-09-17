@@ -10,4 +10,7 @@ export default defineNuxtConfig({
     '@nuxt/image'
   ],
   ssr: false,
+  css: [ 
+    '~/styles/global.css'
+  ],
 })
