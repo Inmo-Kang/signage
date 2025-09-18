@@ -35,7 +35,7 @@ const props = defineProps({
     required: false,
   }
 });
-
+//
 const scheduleData = computed(() => {
   return (props.schedulesData && props.schedulesData.sappaPlus)
     ? props.schedulesData.sappaPlus

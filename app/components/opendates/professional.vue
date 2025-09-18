@@ -35,7 +35,7 @@ const props = defineProps({
     required: false, // 이제 필수가 아닙니다.
   }
 });
-
+//
 // props.schedulesData가 null이거나 schedulesData.professional이 null일 경우
 // 빈 객체를 반환하여 오류를 원천적으로 방지합니다.
 const scheduleData = computed(() => {
