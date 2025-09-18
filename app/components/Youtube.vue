@@ -1,25 +1,13 @@
 <template>
   <div class="youtube-player-container">
-    <div
-      v-if="currentVideo"
-      class="video-wrapper"
-      :class="{'is-short': currentVideo.type === 'short'}"
-    >
-      <iframe
-        :src="videoUrl"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
-      ></iframe>
-    </div>
+    <div ref="playerDiv" class="video-wrapper-placeholder"></div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick } from 'vue';
 
-// 여기에 보여줄 영상 목록을 직접 정의합니다.
-// 학원 유튜브 채널의 영상 ID와 타입을 추가하세요.
+// 보여줄 영상 목록
 const videos = [
   { id: 'YrdEvUv2tNg', type: 'video' }, // 일반 동영상
   { id: 'zzowgRvlIbQ', type: 'short' },  // 쇼츠
@@ -29,55 +17,89 @@ const videos = [
   { id: 'vyT-kACS9nI', type: 'short' }
 ];
 
-const currentVideoIndex = ref(0);
-const currentVideo = computed(() => videos[currentVideoIndex.value]);
+const playerDiv = ref(null); // template의 div를 참조하기 위한 ref
+let player = null; // YT.Player 인스턴스를 저장할 변수
+let currentVideoIndex = 0;
 
-// 현재 비디오의 임베드 URL을 계산합니다.
-const videoUrl = computed(() => {
-  const video = currentVideo.value;
-  if (!video) return '';
-
-  let baseUrl = 'https://www.youtube.com/embed/';
-  let params = 'autoplay=1&mute=1&controls=0&rel=0&showinfo=0&loop=1';
-
-  if (video.type === 'short') {
-    // 쇼츠는 일반 동영상 임베딩 방식과 동일하게 작동합니다.
-    baseUrl = `https://www.youtube.com/embed/${video.id}`;
-  } else {
-    baseUrl = `https://www.youtube.com/embed/${video.id}`;
-  }
-
-  return `${baseUrl}?${params}`;
-});
-
-let timer = null;
-
-// 다음 비디오로 넘어가는 함수
+// 다음 비디오를 재생하는 함수
 const playNextVideo = () => {
-  // 현재 비디오의 예상 재생 시간 (예시)
-  const duration = currentVideo.value.type === 'short' ? 15000 : 90000; // 쇼츠: 15초, 일반 동영상: 1분 30초
+  if (!player || videos.length === 0) return;
   
-  timer = setTimeout(() => {
-    currentVideoIndex.value = (currentVideoIndex.value + 1) % videos.length;
-    playNextVideo(); // 재귀 호출로 다음 영상 전환 예약
-  }, duration);
+  // 인덱스를 순환시킵니다.
+  currentVideoIndex = (currentVideoIndex + 1) % videos.length;
+  const nextVideoId = videos[currentVideoIndex].id;
+  
+  // 다음 비디오를 로드하고 재생합니다.
+  player.loadVideoById(nextVideoId);
 };
 
-// 컴포넌트 마운트 시 자동 재생 시작
+
+// YouTube 플레이어 API의 이벤트 핸들러
+const onPlayerStateChange = (event) => {
+  // event.data가 0이면 영상 재생이 끝났다는 의미입니다.
+  if (event.data === window.YT.PlayerState.ENDED) {
+    playNextVideo();
+  }
+};
+
+// YouTube 플레이어를 생성하는 함수
+const createPlayer = () => {
+  const video = videos[currentVideoIndex];
+  
+  // 영상 타입에 따라 플레이어 크기를 동적으로 결정합니다.
+  const isShort = video.type === 'short';
+  const playerWidth = isShort ? window.innerHeight * 9 / 16 : window.innerWidth * 0.9;
+  const playerHeight = isShort ? window.innerHeight : window.innerWidth * 0.9 * 9 / 16;
+  
+  player = new window.YT.Player(playerDiv.value, {
+    height: playerHeight,
+    width: playerWidth,
+    videoId: video.id,
+    playerVars: {
+      'autoplay': 1,
+      'mute': 1,
+      'controls': 0,
+      'rel': 0,
+      'showinfo': 0,
+      'loop': 0, // 루프는 직접 제어하므로 0으로 설정
+      'playsinline': 1
+    },
+    events: {
+      'onReady': (event) => event.target.playVideo(),
+      'onStateChange': onPlayerStateChange
+    }
+  });
+};
+
+
+// 컴포넌트가 마운트되었을 때 실행됩니다.
 onMounted(() => {
-  playNextVideo();
+  // YouTube API 스크립트가 이미 로드되었는지 확인합니다.
+  if (window.YT && window.YT.Player) {
+    createPlayer();
+  } else {
+    // 스크립트가 없다면 동적으로 추가합니다.
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    // API가 로드되면 onYouTubeIframeAPIReady 함수가 자동으로 호출됩니다.
+    window.onYouTubeIframeAPIReady = () => {
+      createPlayer();
+    };
+  }
 });
 
-// 컴포넌트 언마운트 시 타이머 정리
+// 컴포넌트가 언마운트될 때 플레이어를 정리합니다.
 onUnmounted(() => {
-  if (timer) {
-    clearTimeout(timer);
+  if (player && typeof player.destroy === 'function') {
+    player.destroy();
   }
 });
 </script>
 
 <style scoped>
-/* 전체 컨테이너: 화면을 꽉 채우고 중앙 정렬 */
 .youtube-player-container {
   width: 100vw;
   height: 100vh;
@@ -85,39 +107,11 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-/* 영상 컨테이너 기본 스타일 */
-.video-wrapper {
-  position: relative;
-  width: 90%;
-  height: 0;
-  padding-bottom: 50.625%; /* 16:9 비율 (9 / 16 * 90%) */
   overflow: hidden;
 }
 
-/* 쇼츠를 위한 세로 비율 스타일 */
-.video-wrapper.is-short {
-  width: 40%; /* 화면 너비의 40%로 조정 */
-  padding-bottom: 71.11%; /* 16:9 비율 (16 / 9 * 40%) */
+/* 플레이어가 삽입될 div의 기본 스타일 */
+.video-wrapper-placeholder {
+  /* 크기는 스크립트에서 동적으로 설정됩니다. */
 }
-
-/* iframe을 부모 컨테이너에 꽉 채우기 */
-.video-wrapper iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-/* 코드 설명 📄
-
-* **영상 데이터:** 스크립트 상단 `videos` 배열에 학원 유튜브 영상 ID와 타입을 직접 정의했습니다. **'VIDEO\_ID\_1' 부분을 실제 영상 ID로 바꾸고, 'video' 또는 'short' 타입을 명시**하면 됩니다.
-* **컴퓨티드(Computed) 속성:** `videoUrl`은 `currentVideo`의 ID를 기반으로 임베드 URL을 동적으로 생성합니다. `autoplay=1&mute=1&controls=0` 옵션을 넣어 소리 없이 자동 재생되고 제어바가 보이지 않게 했습니다.
-* **자동 전환:** `playNextVideo` 함수는 `setTimeout`을 이용해 다음 영상을 예약합니다. 쇼츠는 짧은 만큼 15초 뒤, 일반 영상은 1분 30초 뒤에 다음 영상으로 넘어가도록 예시 시간을 설정했습니다.
-* **반응형 레이아웃:** CSS의 **`padding-bottom` 꼼수**를 사용해 영상의 가로세로 비율을 유지했습니다. `.is-short` 클래스가 붙으면 `width`와 `padding-bottom` 값을 조정하여 쇼츠 영상이 세로 비율로 잘 보이게 됩니다. `v-if`를 사용해 영상이 전환될 때 `<iframe>`을 다시 렌더링함으로써 깨끗한 화면을 보장합니다.
-
-이 파일을 `nuxt4-signage/components/Youtube.vue` 경로에 저장하고, `index.vue`에 추가하면 바로 동작합니다.
-*/
 </style>

@@ -2,18 +2,9 @@
   <div class="digital-signage">
     <Transition name="fade" mode="out-in">
       <component
-        v-if="activeComponent"
-        :is="activeComponent"
-        :schedulesData="
-          activeComponent.type === Professional ||
-          activeComponent.type === SappaPlus ||
-          activeComponent.type === Hobby
-            ? schedulesData
-            : null
-        "
-        :portfolioImages="
-          activeComponent.type === Portfolio ? portfolioImages : null
-        "
+        :is="activePage.component"
+        v-bind="activePage.props"
+        :key="activePageIndex"
       />
     </Transition>
   </div>
@@ -22,49 +13,100 @@
 <script setup>
 import { ref, onMounted, onUnmounted, shallowRef } from 'vue';
 
-// 개강일정 데이터 파일
+// 데이터 파일 import
 import { schedulesData } from '~/data/schedules';
-// 포트폴리오 이미지 목록 데이터 파일
 import { portfolioImages } from '~/data/portfoliolist';
 
-// 각 콘텐츠에 해당하는 컴포넌트들을 가져옵니다.
-import Professional from '~/components/opendates/Professional.vue';
-import SappaPlus from '~/components/opendates/SappaPlus.vue';
-import Hobby from '~/components/opendates/Hobby.vue';
+// 컴포넌트 import (하나로 통합!)
+import ScheduleDisplay from '~/components/opendates/ScheduleDisplay.vue'; 
 import Portfolio from '~/components/Portfolio.vue';
 import Youtube from '~/components/Youtube.vue';
 
-// 보여줄 컴포넌트 목록과 각 컴포넌트의 노출 시간을 정의합니다.
-const components = [
-  shallowRef(Professional), // 20초 노출
-  shallowRef(SappaPlus),    // 20초 노출
-  shallowRef(Hobby),        // 20초 노출
-  shallowRef(Portfolio),    // 30초 노출 (이미지 슬라이드쇼)
-  shallowRef(Youtube)       // 60초 노출 (동영상 재생)
+// 각 화면에 대한 정보를 객체로 묶어서 관리합니다.
+const signagePages = [
+  {
+    component: ScheduleDisplay, // shallowRef() 제거
+    duration: 20000,
+    props: {
+      title: schedulesData.professional.title,
+      schedules: schedulesData.professional.schedules,
+      courseNameMap: {
+        'pro-ad-photo-am': '광고사진 (오전반)',
+        'pro-ad-photo-pm': '광고사진 (저녁반)',
+        'pro-ad-photo-transfer-am': '광고사진 편입반 (오전반)',
+        'pro-ad-photo-transfer-pm': '광고사진 편입반 (저녁반)',
+      },
+      theme: {
+        bgColor: 'var(--color-subtle-accent-light-orange)',
+        textColor: 'var(--color-primary-accent-brand-orange)',
+        accentColor: 'var(--color-primary-accent-brand-orange)',
+      }
+    }
+  },
+  {
+    component: ScheduleDisplay, // shallowRef() 제거
+    duration: 20000,
+    props: {
+      title: schedulesData.sappaPlus.title,
+      schedules: schedulesData.sappaPlus.schedules,
+      courseNameMap: {
+        'sappa-plus-film-darkroom-intro': '필름 암실 기초',
+        'sappa-plus-lightroom-basic': '라이트룸 기초',
+        'sappa-plus-lightroom-intermediate': '라이트룸 중급 (Classic)',
+        'sappa-plus-technician-certificate-practical': '사진기능사 자격증 대비반 (실기)',
+        'sappa-plus-cyanotype': '아날로그 블루 프린트: Cyanotype',
+      },
+      theme: {
+        bgColor: 'var(--color-subtle-accent-light-orange)',
+        textColor: 'var(--color-primary-accent-brand-orange)',
+        accentColor: 'var(--color-primary-accent-brand-orange)',
+      }
+    }
+  },
+  {
+    component: ScheduleDisplay, // shallowRef() 제거
+    duration: 20000,
+    props: {
+      title: schedulesData.hobby.title,
+      schedules: schedulesData.hobby.schedules,
+      courseNameMap: {
+        'hobby-intro': '취미사진 입문반',
+        'hobby-intermediate': '취미사진 중급반',
+        'hobby-day-shooting': '주간실전 촬영반',
+        'hobby-night-shooting': '야경사진 촬영반',
+      },
+      theme: {
+        bgColor: 'var(--color-subtle-accent-light-blue)',
+        textColor: 'var(--color-secondary-accent-brand-blue)',
+        accentColor: 'var(--color-secondary-accent-brand-blue)',
+      }
+    }
+  },
+  {
+    component: Portfolio, // shallowRef() 제거
+    duration: 30000,
+    props: {
+      portfolioImages: portfolioImages,
+    }
+  },
+  {
+    component: Youtube, // shallowRef() 제거
+    duration: 60000,
+    props: {}
+  },
 ];
 
-const exposureDurations = [
-  20000, // Professional.vue
-  20000, // SappaPlus.vue
-  20000, // Hobby.vue
-  30000, // Portfolio.vue
-  60000, // Youtube.vue
-];
-
-const activeComponent = ref(components[0]);
-let componentIndex = 0;
+const activePageIndex = ref(0);
+const activePage = computed(() => signagePages[activePageIndex.value]);
 let timer = null;
 
-// 타이머를 시작하고 컴포넌트를 순차적으로 전환하는 함수
 const startSignage = () => {
   timer = setTimeout(() => {
-    componentIndex = (componentIndex + 1) % components.length;
-    activeComponent.value = components[componentIndex];
-    startSignage(); // 재귀 호출로 다음 전환 예약
-  }, exposureDurations[componentIndex]);
+    activePageIndex.value = (activePageIndex.value + 1) % signagePages.length;
+    startSignage();
+  }, signagePages[activePageIndex.value].duration);
 };
 
-// 페이지가 마운트되면 타이머를 시작하고, 언마운트되면 타이머를 정리합니다.
 onMounted(() => {
   startSignage();
 });

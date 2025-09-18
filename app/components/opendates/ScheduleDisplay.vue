@@ -1,13 +1,13 @@
 <template>
-  <div class="schedule-section hobby">
+  <div class="schedule-section" :style="{ backgroundColor: theme.bgColor }">
     <div class="section-title">
-      <h1>{{ scheduleData.title }}</h1>
+      <h1 :style="{ color: theme.textColor }">{{ title }}</h1>
     </div>
     <div class="schedule-list-container">
       <ul class="schedule-list">
         <li v-for="course in filteredSchedules" :key="course.courseId" class="course-item">
           <div class="course-info-box">
-            <div class="course-status-badge" :class="course.status">
+            <div class="course-status-badge" :class="course.status" :style="badgeStyle(course.status)">
               {{ course.status }}
             </div>
             <div class="course-details">
@@ -15,7 +15,7 @@
               <ul class="display-items">
                 <li v-for="item in course.displayItems" :key="item.label" class="display-item">
                   <div class="label">{{ item.label }}</div>
-                  <div class="value" :class="{ 'is-price': item.isPrice }">{{ item.value }}</div>
+                  <div class="value" :class="{ 'is-price': item.isPrice }" :style="priceStyle(item.isPrice)">{{ item.value }}</div>
                 </li>
               </ul>
             </div>
@@ -30,35 +30,42 @@
 import { computed } from 'vue';
 
 const props = defineProps({
-  schedulesData: {
-    type: Object,
-    required: false,
-  }
+  // 컴포넌트로 전달될 데이터 props 정의
+  title: { type: String, required: true },
+  schedules: { type: Array, required: true },
+  courseNameMap: { type: Object, required: true },
+  theme: { type: Object, required: true },
 });
 
-const scheduleData = computed(() => {
-  return (props.schedulesData && props.schedulesData.hobby)
-    ? props.schedulesData.hobby
-    : { title: '', schedules: [] };
-});
-
+// '모집중'인 데이터만 필터링
 const filteredSchedules = computed(() => {
-  return scheduleData.value.schedules.filter(course => course.status === '모집중');
+  return props.schedules.filter(course => course.status === '모집중');
 });
 
+// courseId에 따라 한글 이름 반환
 const getCourseName = (courseId) => {
-  const courseNames = {
-    'hobby-intro': '취미사진 입문반',
-    'hobby-intermediate': '취미사진 중급반',
-    'hobby-day-shooting': '주간실전 촬영반',
-    'hobby-night-shooting': '야경사진 촬영반',
-  };
-  return courseNames[courseId] || '과정명 없음';
+  return props.courseNameMap[courseId] || '과정명 없음';
+};
+
+// 동적 스타일링을 위한 computed 속성
+const badgeStyle = (status) => {
+  if (status === '모집중') {
+    return { backgroundColor: props.theme.accentColor };
+  }
+  return {}; // 다른 상태는 기존 CSS 클래스에 맡김
+};
+
+const priceStyle = (isPrice) => {
+  if (isPrice) {
+    return { color: props.theme.accentColor };
+  }
+  return {};
 };
 </script>
 
 <style scoped>
-/* 섹션 공통 스타일 */
+/* 기존 Professional.vue, Hobby.vue 등에서 사용하던 CSS를 그대로 가져옵니다. */
+/* 테마색 관련 부분은 동적 스타일로 처리되므로 일부 수정됩니다. */
 .schedule-section {
   width: 100%;
   height: 100%;
@@ -69,16 +76,13 @@ const getCourseName = (courseId) => {
   justify-content: flex-start;
   align-items: center;
   gap: 3rem;
-  background-color: var(--color-subtle-accent-light-blue);
 }
 
 .section-title h1 {
   font-size: 3rem;
   font-weight: 800;
-  color: var(--color-secondary-accent-brand-blue);
 }
 
-/* 리스트 컨테이너 스타일 */
 .schedule-list-container {
   width: 100%;
   overflow-y: auto;
@@ -97,7 +101,6 @@ const getCourseName = (courseId) => {
   width: 100%;
 }
 
-/* 코스 정보 박스 스타일 */
 .course-info-box {
   background-color: var(--color-primary-neutral-white);
   border-radius: 12px;
@@ -110,7 +113,6 @@ const getCourseName = (courseId) => {
   justify-content: space-between;
 }
 
-/* 상태 배지 스타일 */
 .course-status-badge {
   position: absolute;
   top: -10px;
@@ -123,23 +125,17 @@ const getCourseName = (courseId) => {
   transform: rotate(5deg);
 }
 
-.course-status-badge.모집중 {
-  background-color: var(--color-secondary-accent-brand-blue);
-}
-
+/* '모집중' 상태는 이제 동적 스타일로 처리됩니다. */
 .course-status-badge.모집예정 {
   background-color: var(--color-secondary-neutral-medium-gray-1);
 }
-
 .course-status-badge.모집마감 {
   background-color: var(--color-primary-neutral-dark-gray);
 }
-
 .course-status-badge.마감임박 {
-  background-color: #e53e3e; /* Red color */
+  background-color: #e53e3e;
 }
 
-/* 코스 상세 정보 스타일 */
 .course-id {
   font-size: 1.5rem;
   font-weight: 700;
@@ -173,6 +169,5 @@ const getCourseName = (courseId) => {
 
 .value.is-price {
   font-weight: 700;
-  color: var(--color-secondary-accent-brand-blue);
 }
 </style>
