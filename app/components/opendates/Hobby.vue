@@ -1,5 +1,5 @@
 <template>
-  <div class="schedule-section professional">
+  <div class="schedule-section hobby">
     <div class="section-title">
       <h1>{{ scheduleData.title }}</h1>
     </div>
@@ -32,30 +32,26 @@ import { computed } from 'vue';
 const props = defineProps({
   schedulesData: {
     type: Object,
-    required: false, // 이제 필수가 아닙니다.
+    required: false,
   }
 });
-//
-// props.schedulesData가 null이거나 schedulesData.professional이 null일 경우
-// 빈 객체를 반환하여 오류를 원천적으로 방지합니다.
+
 const scheduleData = computed(() => {
-  return (props.schedulesData && props.schedulesData.professional)
-    ? props.schedulesData.professional
+  return (props.schedulesData && props.schedulesData.hobby)
+    ? props.schedulesData.hobby
     : { title: '', schedules: [] };
 });
 
-// '모집중'인 데이터만 필터링하는 computed 속성
 const filteredSchedules = computed(() => {
   return scheduleData.value.schedules.filter(course => course.status === '모집중');
 });
 
-// courseId에 따라 한글 이름을 반환하는 헬퍼 함수
 const getCourseName = (courseId) => {
   const courseNames = {
-    'pro-ad-photo-am': '광고사진 (오전반)',
-    'pro-ad-photo-pm': '광고사진 (저녁반)',
-    'pro-ad-photo-transfer-am': '광고사진 편입반 (오전반)',
-    'pro-ad-photo-transfer-pm': '광고사진 편입반 (저녁반)',
+    'hobby-intro': '취미사진 입문반',
+    'hobby-intermediate': '취미사진 중급반',
+    'hobby-day-shooting': '주간실전 촬영반',
+    'hobby-night-shooting': '야경사진 촬영반',
   };
   return courseNames[courseId] || '과정명 없음';
 };
@@ -73,13 +69,13 @@ const getCourseName = (courseId) => {
   justify-content: flex-start;
   align-items: center;
   gap: 3rem;
-  background-color: var(--color-subtle-accent-light-orange);
+  background-color: var(--color-subtle-accent-light-blue);
 }
 
 .section-title h1 {
   font-size: 3rem;
   font-weight: 800;
-  color: var(--color-primary-accent-brand-orange);
+  color: var(--color-secondary-accent-brand-blue);
 }
 
 /* 리스트 컨테이너 스타일 */
@@ -128,7 +124,7 @@ const getCourseName = (courseId) => {
 }
 
 .course-status-badge.모집중 {
-  background-color: var(--color-primary-accent-brand-orange);
+  background-color: var(--color-secondary-accent-brand-blue);
 }
 
 .course-status-badge.모집예정 {
@@ -177,6 +173,6 @@ const getCourseName = (courseId) => {
 
 .value.is-price {
   font-weight: 700;
-  color: var(--color-primary-accent-brand-orange);
+  color: var(--color-secondary-accent-brand-blue);
 }
 </style>

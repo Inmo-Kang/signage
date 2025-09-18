@@ -1,5 +1,5 @@
 <template>
-  <div class="schedule-section sappa-plus">
+  <div class="schedule-section professional">
     <div class="section-title">
       <h1>{{ scheduleData.title }}</h1>
     </div>
@@ -32,38 +32,30 @@ import { computed } from 'vue';
 const props = defineProps({
   schedulesData: {
     type: Object,
-    required: false,
+    required: false, // 이제 필수가 아닙니다.
   }
 });
-//
+
+// props.schedulesData가 null이거나 schedulesData.professional이 null일 경우
+// 빈 객체를 반환하여 오류를 원천적으로 방지합니다.
 const scheduleData = computed(() => {
-  return (props.schedulesData && props.schedulesData.sappaPlus)
-    ? props.schedulesData.sappaPlus
+  return (props.schedulesData && props.schedulesData.professional)
+    ? props.schedulesData.professional
     : { title: '', schedules: [] };
 });
 
+// '모집중'인 데이터만 필터링하는 computed 속성
 const filteredSchedules = computed(() => {
   return scheduleData.value.schedules.filter(course => course.status === '모집중');
 });
 
+// courseId에 따라 한글 이름을 반환하는 헬퍼 함수
 const getCourseName = (courseId) => {
   const courseNames = {
-    'sappa-plus-film-darkroom-intro': '필름 암실 기초',
-    'sappa-plus-film-darkroom-intermediate': '필름 암실 중급',
-    'sappa-plus-wedding': '웨딩 스튜디오 및 본식 촬영',
-    'sappa-plus-exhibition-planning': '사진전시 기획',
-    'sappa-plus-lightroom-basic': '라이트룸 기초',
-    'sappa-plus-lightroom-intermediate': '라이트룸 중급 (Classic)',
-    'sappa-plus-portfolio-production': '포트폴리오 제작',
-    'sappa-plus-technician-certificate-theory': '사진기능사 자격증 대비반 (이론)',
-    'sappa-plus-technician-certificate-practical': '사진기능사 자격증 대비반 (실기)',
-    'sappa-plus-ai-product-photo': 'AI를 활용한 쇼핑몰 제품 촬영',
-    'sappa-plus-product-photo': '스마트스토어 & 인스타그램 제품사진',
-    'sappa-plus-photo-essay': '감성 가득, 나만의 포토 에세이 만들기',
-    'sappa-plus-contemporary-photo-intro': '현대 미술 사진 맛보기',
-    'sappa-plus-cyanotype': '아날로그 블루 프린트: Cyanotype',
-    'sappa-plus-sappa-sapiens': 'SAPPA신잡: 테마로 보는 현대 미술과 사진',
-    'sappa-plus-travel-photo': '여행사진 촬영부터 보정까지',
+    'pro-ad-photo-am': '광고사진 (오전반)',
+    'pro-ad-photo-pm': '광고사진 (저녁반)',
+    'pro-ad-photo-transfer-am': '광고사진 편입반 (오전반)',
+    'pro-ad-photo-transfer-pm': '광고사진 편입반 (저녁반)',
   };
   return courseNames[courseId] || '과정명 없음';
 };

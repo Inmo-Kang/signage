@@ -1,5 +1,5 @@
 <template>
-  <div class="schedule-section hobby">
+  <div class="schedule-section sappa-plus">
     <div class="section-title">
       <h1>{{ scheduleData.title }}</h1>
     </div>
@@ -28,7 +28,7 @@
 
 <script setup>
 import { computed } from 'vue';
-//
+
 const props = defineProps({
   schedulesData: {
     type: Object,
@@ -37,8 +37,8 @@ const props = defineProps({
 });
 
 const scheduleData = computed(() => {
-  return (props.schedulesData && props.schedulesData.hobby)
-    ? props.schedulesData.hobby
+  return (props.schedulesData && props.schedulesData.sappaPlus)
+    ? props.schedulesData.sappaPlus
     : { title: '', schedules: [] };
 });
 
@@ -48,10 +48,22 @@ const filteredSchedules = computed(() => {
 
 const getCourseName = (courseId) => {
   const courseNames = {
-    'hobby-intro': '취미사진 입문반',
-    'hobby-intermediate': '취미사진 중급반',
-    'hobby-day-shooting': '주간실전 촬영반',
-    'hobby-night-shooting': '야경사진 촬영반',
+    'sappa-plus-film-darkroom-intro': '필름 암실 기초',
+    'sappa-plus-film-darkroom-intermediate': '필름 암실 중급',
+    'sappa-plus-wedding': '웨딩 스튜디오 및 본식 촬영',
+    'sappa-plus-exhibition-planning': '사진전시 기획',
+    'sappa-plus-lightroom-basic': '라이트룸 기초',
+    'sappa-plus-lightroom-intermediate': '라이트룸 중급 (Classic)',
+    'sappa-plus-portfolio-production': '포트폴리오 제작',
+    'sappa-plus-technician-certificate-theory': '사진기능사 자격증 대비반 (이론)',
+    'sappa-plus-technician-certificate-practical': '사진기능사 자격증 대비반 (실기)',
+    'sappa-plus-ai-product-photo': 'AI를 활용한 쇼핑몰 제품 촬영',
+    'sappa-plus-product-photo': '스마트스토어 & 인스타그램 제품사진',
+    'sappa-plus-photo-essay': '감성 가득, 나만의 포토 에세이 만들기',
+    'sappa-plus-contemporary-photo-intro': '현대 미술 사진 맛보기',
+    'sappa-plus-cyanotype': '아날로그 블루 프린트: Cyanotype',
+    'sappa-plus-sappa-sapiens': 'SAPPA신잡: 테마로 보는 현대 미술과 사진',
+    'sappa-plus-travel-photo': '여행사진 촬영부터 보정까지',
   };
   return courseNames[courseId] || '과정명 없음';
 };
@@ -69,13 +81,13 @@ const getCourseName = (courseId) => {
   justify-content: flex-start;
   align-items: center;
   gap: 3rem;
-  background-color: var(--color-subtle-accent-light-blue);
+  background-color: var(--color-subtle-accent-light-orange);
 }
 
 .section-title h1 {
   font-size: 3rem;
   font-weight: 800;
-  color: var(--color-secondary-accent-brand-blue);
+  color: var(--color-primary-accent-brand-orange);
 }
 
 /* 리스트 컨테이너 스타일 */
@@ -124,7 +136,7 @@ const getCourseName = (courseId) => {
 }
 
 .course-status-badge.모집중 {
-  background-color: var(--color-secondary-accent-brand-blue);
+  background-color: var(--color-primary-accent-brand-orange);
 }
 
 .course-status-badge.모집예정 {
@@ -173,6 +185,6 @@ const getCourseName = (courseId) => {
 
 .value.is-price {
   font-weight: 700;
-  color: var(--color-secondary-accent-brand-blue);
+  color: var(--color-primary-accent-brand-orange);
 }
 </style>
