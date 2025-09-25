@@ -13,7 +13,4 @@ export default defineNuxtConfig({
   css: [ 
     '~/styles/global.css'
   ],
-  app: {
-    baseURL: './', // 이 부분을 추가하세요!
-  },
 })
