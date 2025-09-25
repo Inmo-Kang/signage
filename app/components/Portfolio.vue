@@ -6,7 +6,6 @@
         :src="currentImage"
         alt="Portfolio image"
         class="portfolio-image"
-        loading="lazy"
       />
     </Transition>
   </div>
