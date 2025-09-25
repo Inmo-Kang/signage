@@ -3,28 +3,28 @@
     font-family: 'Pretendard';
     font-weight: 400; /* Regular */
     font-style: normal;
-    src: url('/fonts/Pretendard-Regular.woff2') format('woff2');
+    src: url('/fonts/Pretendard-Regular.woff') format('woff');
 }
 
 @font-face {
     font-family: 'Pretendard';
     font-weight: 600; /* SemiBold */
     font-style: normal;
-    src: url('/fonts/Pretendard-SemiBold.woff2') format('woff2');
+    src: url('/fonts/Pretendard-SemiBold.woff') format('woff');
 }
 
 @font-face {
     font-family: 'Pretendard';
     font-weight: 700; /* Bold */
     font-style: normal;
-    src: url('/fonts/Pretendard-Bold.woff2') format('woff2');
+    src: url('/fonts/Pretendard-Bold.woff') format('woff');
 }
 
 @font-face {
     font-family: 'Pretendard';
     font-weight: 800; /* ExtraBold */
     font-style: normal;
-    src: url('/fonts/Pretendard-ExtraBold.woff2') format('woff2');
+    src: url('/fonts/Pretendard-ExtraBold.woff') format('woff');
 }
 
 @font-face {
