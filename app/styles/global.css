@@ -1,4 +1,39 @@
 /* /styles/global.css */
+@font-face {
+    font-family: 'Pretendard';
+    font-weight: 400; /* Regular */
+    font-style: normal;
+    src: url('/fonts/Pretendard-Regular.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Pretendard';
+    font-weight: 600; /* SemiBold */
+    font-style: normal;
+    src: url('/fonts/Pretendard-SemiBold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Pretendard';
+    font-weight: 700; /* Bold */
+    font-style: normal;
+    src: url('/fonts/Pretendard-Bold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Pretendard';
+    font-weight: 800; /* ExtraBold */
+    font-style: normal;
+    src: url('/fonts/Pretendard-ExtraBold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Material Icons Outlined';
+  font-style: normal;
+  font-weight: 400;
+  /* 파일 이름과 format을 otf에 맞게 수정 */
+  src: url('/fonts/MaterialIconsOutlined-Regular.otf') format('opentype');
+}
 :root {
   --color-primary-neutral-white: #FFFFFF;
   --color-primary-neutral-light-gray: #F8F9FA;
