@@ -1,6 +1,4 @@
 <template>
-  <h1>hello SAPPA
-  </h1>
   <Portfolio />
 </template>
 <script>
