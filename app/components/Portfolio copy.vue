@@ -1,11 +1,14 @@
 <template>
   <div class="portfolio-slideshow-container">
     <Transition name="fade" mode="out-in">
-      <img
+      <NuxtImg
         :key="currentImage"
         :src="currentImage"
         alt="Portfolio image"
         class="portfolio-image"
+        format="webp"
+        quality="80"
+        placeholder
         loading="lazy"
       />
     </Transition>

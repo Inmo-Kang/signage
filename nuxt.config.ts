@@ -10,10 +10,6 @@ export default defineNuxtConfig({
     '@nuxt/image'
   ],
 
-  image: {
-    provider: 'ipxStatic' // 'static'이 아니라 'ipxStatic'으로 변경해주세요!
-  },
-
   ssr: false,
   css: [ 
     '~/styles/global.css'
