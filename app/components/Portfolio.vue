@@ -13,32 +13,46 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-// portfolioImages 데이터 파일을 가져옵니다.
 import { portfolioImages } from '~/data/portfoliolist';
 
 const images = ref(portfolioImages);
-
 const currentImageIndex = ref(0);
 const currentImage = ref(images.value[currentImageIndex.value]);
 
 let timer = null;
 const transitionDuration = 5000; // 5초마다 이미지 전환
 
+// 다음 이미지를 미리 로드하고 '디코딩'까지 완료하는 비동기 함수
+const preloadAndDecodeNextImage = async () => {
+  const nextImageIndex = (currentImageIndex.value + 1) % images.value.length;
+  const imageUrl = images.value[nextImageIndex];
+
+  const img = new Image();
+  img.src = imageUrl;
+  try {
+    // 이 부분이 핵심! 이미지를 화면에 보이지 않는 상태에서 미리 디코딩합니다.
+    await img.decode(); 
+  } catch (error) {
+    console.error('Image decoding failed:', error);
+  }
+};
+
 const startSlideshow = () => {
   timer = setInterval(() => {
+    // 다음 이미지로 인덱스를 업데이트하고
     currentImageIndex.value = (currentImageIndex.value + 1) % images.value.length;
     currentImage.value = images.value[currentImageIndex.value];
-
-    preloadNextImage();
-
+    
+    // 화면이 전환되자마자, 그 다음 이미지를 배경에서 준비시킵니다.
+    preloadAndDecodeNextImage();
   }, transitionDuration);
 };
 
-onMounted(() => {
+onMounted(async () => {
   if (images.value.length > 1) {
+    // 슬라이드쇼를 시작하기 전에, 첫 번째로 보일 '다음' 이미지를 미리 준비합니다.
+    await preloadAndDecodeNextImage();
     startSlideshow();
-  } else if (images.value.length === 1) {
-    currentImage.value = images.value[0];
   }
 });
 
