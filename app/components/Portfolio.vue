@@ -1,13 +1,11 @@
 <template>
   <div class="portfolio-slideshow-container">
-    <Transition name="fade" mode="out-in">
       <img
         :key="currentImage"
         :src="currentImage"
         alt="Portfolio image"
         class="portfolio-image"
       />
-    </Transition>
   </div>
 </template>
 
@@ -85,16 +83,5 @@ onUnmounted(() => {
   transform: translateZ(0); 
   /* 앞으로 opacity 속성이 변경될 것이라고 미리 알려주어 최적화 유도 */
   will-change: opacity;
-}
-
-/* Vue Transition CSS */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 1s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>
