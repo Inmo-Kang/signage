@@ -28,6 +28,9 @@ const startSlideshow = () => {
   timer = setInterval(() => {
     currentImageIndex.value = (currentImageIndex.value + 1) % images.value.length;
     currentImage.value = images.value[currentImageIndex.value];
+
+    preloadNextImage();
+
   }, transitionDuration);
 };
 
@@ -64,6 +67,10 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   object-fit: contain; /* 이미지 비율 유지하며 컨테이너에 맞춤 */
+  /* 이 이미지는 독립된 레이어에서 처리하도록 GPU에 힌트 제공 */
+  transform: translateZ(0); 
+  /* 앞으로 opacity 속성이 변경될 것이라고 미리 알려주어 최적화 유도 */
+  will-change: opacity;
 }
 
 /* Vue Transition CSS */
